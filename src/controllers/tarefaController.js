@@ -11,17 +11,17 @@ class TarefaController {
     }
   };
 
-  create = async  (req, res) => {
+  create = async (req, res) => {
     const { descricao } = req.body;
-    try{    
+    try {
       if (!descricao) {
         return res.status(400).json({ erro: "Descrição é obrigatória" });
       }
       const novaTarefa = tarefaModel.create(descricao);
       res.status(201).json(novaTarefa);
-    } catch (error){
-        console.log(error);
-        res.status(500).json({ erro:"Erro ao criar tarefa" })
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ erro: "Erro ao criar tarefa" })
     }
   };
 
@@ -29,25 +29,34 @@ class TarefaController {
     const { id } = req.params
     const { concluida, descricao } = req.body;
 
-    try{
+    try {
       const tarefaAtualizada = await tarefaModel.update(Number(id), concluida, descricao);
 
-      if(!tarefaAtualizada) {
-        return res.status(404).json({ erro:"Tarefa não encontrada!" })
+      if (!tarefaAtualizada) {
+        return res.status(404).json({ erro: "Tarefa não encontrada!" })
       }
 
       res.json(tarefaAtualizada);
     } catch (error) {
-      console.error(error)
-      res.status(500).json({ erro: "Erro ao atualizar tarefa"})
+      console.log(error)
+      res.status(500).json({ erro: "Erro ao atualizar tarefa" })
     }
   };
-  delete = ({ params: { id } }, res) => {
-    const sucesso = tarefaModel.delete(id);
-    if (!sucesso) {
-      return res.status(404).json({ erro: "Tarefa não encontrada" });
+  delete = async (req, res) => {
+    const { id } = req.params
+
+    try {
+      const sucesso = await tarefaModel.delete(Number(id));
+
+      if (!sucesso) {
+        return res.status(404).json({ erro: "Tarefa não encontrada!" })
+      }
+
+      res.status(200).send({ message: "Tarefa deletada com sucesso"})
+    } catch (error) {
+      console.log(error)
+      res.status(500).json({ erro: "Erro ao deletar tarefa" })
     }
-    res.status(204).send();
   };
 }
 export default new TarefaController();
